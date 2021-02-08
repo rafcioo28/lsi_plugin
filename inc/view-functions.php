@@ -1,5 +1,14 @@
 <?php
 
+// Redirect not logged in users
+if ( ! function_exists( 'default_quantity' ) ) {
+    function login_redirect() {  
+        global $pagenow;
+        if(!is_user_logged_in() && $pagenow != 'wp-login.php')
+            auth_redirect();
+    }
+}
+
 // Default quantity for package of products
 if ( ! function_exists( 'default_quantity' ) ) {
     function default_quantity( $args, $product ) {
