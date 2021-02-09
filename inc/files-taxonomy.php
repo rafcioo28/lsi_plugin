@@ -33,3 +33,63 @@ function file_category() {
     );
     register_taxonomy( 'file_category', 'file', $args );
 }
+
+
+/**
+*   Functions for display files table on taxonomy archive page
+*/
+
+function single_file_tax($query) {
+	if (!is_admin() AND is_tax('file_category') AND $query->is_main_query()) {
+		$query->set('posts_per_page', 1);
+	}
+}
+
+function display_title_of_taxonomy( $post ) {
+	global $wp_query;
+
+	if (is_tax('file_category')) {
+		$tax = $wp_query->get_queried_object();
+		$post->post_title = $tax->name;
+	}
+}
+
+
+// Display pages with files grouped in taxonomies
+function file_taxonomy_pages( $content ){
+	global $wp_query;
+
+	if (is_tax('file_category')) {
+		$tax = $wp_query->get_queried_object();
+
+		$manuals = get_posts(array(
+			'post_type' => 'file',
+			'tax_query'	=> array(
+				array(
+					'taxonomy' 	=> 'file_category',
+					'field'	  	=> 'term_is',
+					'terms'		=> $tax->term_id,
+				),
+			),
+		)
+		);
+		$content .= '<div class="entry-content"><table>';
+
+	foreach($manuals as $manual) {
+		$field = get_field('file', $manual->ID);
+		$content .= '<tr>';
+		$content .= '<td>';
+		$content .= $manual->post_title;
+		$content .= '</td>';
+		$content .= '<td>';
+		$content .= '<a href="' . $field['url'] . '">Pobierz</a>';
+		$content .= '</td>';
+		$content .= '</tr>';
+	}
+
+		$content .= '</table></div>';
+		echo $content;
+	}	else {
+	return $content;
+	}
+};
