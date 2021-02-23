@@ -123,3 +123,18 @@ function save_user_customer_group_terms( $user_id ) {
     wp_set_object_terms( $user_id, $term, 'customer_group', false);
     clean_object_term_cache( $user_id, 'customer_group' );
   }
+
+/**
+ * Update parent file name to fix the selected menu issue
+ */
+function user_taxonomy_parent_file($parent_file)
+{
+    global $submenu_file;
+    if (
+      isset($_GET['taxonomy']) && 
+      $_GET['taxonomy'] == 'customer_group' &&
+      $submenu_file == 'edit-tags.php?taxonomy=customer_group'
+    ) 
+    $parent_file = 'users.php';
+    return $parent_file;
+}

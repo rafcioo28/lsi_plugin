@@ -12,6 +12,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 require plugin_dir_path(__FILE__) . '/inc/login-form.php';
+require plugin_dir_path(__FILE__) . '/inc/disable-comments.php';
 require plugin_dir_path(__FILE__) . '/inc/custom-post-types.php';
 require plugin_dir_path(__FILE__) . '/inc/user-taxonomy.php';
 require plugin_dir_path(__FILE__) . '/inc/files-taxonomy.php';
@@ -27,6 +28,7 @@ require plugin_dir_path(__FILE__) . '/inc/custom-tax-widget.php';
 add_action( 'wp', 'login_redirect' ); // Login redirect
 add_action( 'init', 'lsi_post_types' ); // Init custom post types
 add_action( 'init', 'customer_group' );	// User groups - Taxonomy
+add_filter('parent_file', 'user_taxonomy_parent_file'); // Menu fix for user taxonomy 
 add_action( 'init', 'file_category' );	// Files category - Taxonomy
 add_action( 'admin_menu', 'add_customer_group_admin_page' ); // Add User groups to the admin menu
 add_filter( 'woocommerce_quantity_input_args', 'default_quantity', 10, 2 ); // set auto quantity to group of products
@@ -52,6 +54,7 @@ add_shortcode('manuals', 'manuals_table'); // register shortcode for files downl
 
 add_action('woocommerce_single_product_summary', 'lsiDisplayFiles', 41); // Add files button to product
 add_action('pre_get_posts', 'lsi_product_query_filter'); // Add product filter by customer's group 
+add_action('woocommerce_output_related_products_args', 'related_product_filter'); // Related products filter 
 
 //filter
 add_filter( 'woocommerce_after_single_product_summary', 'products_package', 10);  // Display product packages 

@@ -1,7 +1,7 @@
 <?php
 
 // Redirect not logged in users
-if ( ! function_exists( 'default_quantity' ) ) {
+if ( ! function_exists( 'login_redirect' ) ) {
     function login_redirect() {  
         global $pagenow;
         if(!is_user_logged_in() && $pagenow != 'wp-login.php')
