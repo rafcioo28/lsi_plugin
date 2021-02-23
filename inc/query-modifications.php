@@ -70,12 +70,24 @@ if ( ! function_exists( 'lsi_product_query_filter' ) ) {
 }
 
 // filter query on related product block
-if (! function_exists( 'related_product_filter' )) {
+if (! function_exists( 'related_product_filter_lsi' )) {
 
-	function related_product_filter($query) {
+	function related_product_filter_lsi() {
+		global $product;
+		$terms = get_the_terms($product->ID, 'product_cat');
 		$user_groups = wp_get_object_terms(get_current_user_id(), 'customer_group', array('fields' => 'all_with_object_id'));  // Get user group detail
     	// Create meta query
-    	$meta_query = array(
+		
+
+		$query = array(
+			'post_type'      => 'product',
+			'orderby'   => 'rand',
+			'posts_per_page' => 5,
+			'product_cat'    => $terms[0]->slug,
+		);
+
+
+		$meta_query = array(
     		'relation'  =>  'OR',
     		array(
     			'key'     => 'customer_group',
@@ -95,14 +107,27 @@ if (! function_exists( 'related_product_filter' )) {
 
 		$query['meta_key'] = 'customer_group';
 	    $query['meta_query'] = $meta_query;
-		return $query;
+
+
+		$related_products = get_posts($query);
+		$related_after_filter = array();
+		foreach($related_products as $prod) {
+			$related_after_filter[] = $prod->ID;
+		}
+
+        $product_shortcode = '[products ids="' . implode(',', $related_after_filter) . '" columns="5"]';
+        
+		echo '<h2>Powiązane produkty</h2><br>';
+
+        echo do_shortcode($product_shortcode);
+
 	}
 }
 
 
 
-if ( ! function_exists( 'filter_recent_posts_events' ) ) {
-	function filter_recent_posts_widget($args) {
+if ( ! function_exists( 'filter_recent_posts_widget' ) ) {
+	function filter_recent_posts_widget($query) {
 
 		$user_groups = wp_get_object_terms(get_current_user_id(), 'customer_group', array('fields' => 'all_with_object_id'));  // Get user group detail
 
@@ -126,11 +151,11 @@ if ( ! function_exists( 'filter_recent_posts_events' ) ) {
 	    	    			));
 	    	    		}
 	    	    	}
-	                $args['meta_key'] = 'groups_list';
-	    	        $args['meta_query'] = $meta_query;
+	                $query['meta_key'] = 'groups_list';
+	    	        $query['meta_query'] = $meta_query;
 
 
 
-	    return $args;
+	    return $query;
 	}
 }

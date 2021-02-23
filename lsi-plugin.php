@@ -23,7 +23,6 @@ require plugin_dir_path(__FILE__) . '/inc/query-modifications.php';
 require plugin_dir_path(__FILE__) . '/inc/custom-tax-widget.php';
 
 //require get_theme_file_path('/inc/woo-tweaks.php');
-//require get_theme_file_path('/inc/package-products-tweaks.php');
 
 add_action( 'wp', 'login_redirect' ); // Login redirect
 add_action( 'init', 'lsi_post_types' ); // Init custom post types
@@ -54,10 +53,17 @@ add_shortcode('manuals', 'manuals_table'); // register shortcode for files downl
 
 add_action('woocommerce_single_product_summary', 'lsiDisplayFiles', 41); // Add files button to product
 add_action('pre_get_posts', 'lsi_product_query_filter'); // Add product filter by customer's group 
-add_action('woocommerce_output_related_products_args', 'related_product_filter'); // Related products filter 
 
 //filter
 add_filter( 'woocommerce_after_single_product_summary', 'products_package', 10);  // Display product packages 
+add_action( 'woocommerce_after_single_product_summary', 'related_product_filter_lsi', 20);
+
+
+add_action( 'init', 'lsi_remove_hooks', 11 );
+function lsi_remove_hooks(){ 
+	remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+
+}
 
 
 /**
@@ -77,7 +83,6 @@ add_action( 'user_register', 'save_user_customer_group_terms' );
 
 
 //tests
-
 
 
 

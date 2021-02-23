@@ -40,8 +40,16 @@ if ( ! function_exists( 'lsiDisplayFiles' ) ) {
         if ($relatedFiles->have_posts()) {
             while($relatedFiles->have_posts()) {
                 $relatedFiles->the_post();
-                $manual = get_field('file');?>
-                <a href="<?php echo $manual['url']; ?>" class="button">Pobierz instrukcję</a>
+                $manual = get_field('file');
+                $terms = get_the_terms($ID, 'file_category');
+                if ($terms) {
+                    $download_name = $terms[0]->name;
+                } else {
+                    $download_name = 'Pobierz';
+                }
+                ?>
+
+                <a href="<?php echo $manual['url']; ?>" class="button"><?php echo $download_name; ?></a>
             
             <?php }
         }
@@ -89,6 +97,7 @@ if ( ! function_exists( 'wc_get_parent_grouped_id' ) ) {
 }
 
 // Display product packages in group
+
 function products_package($test) {
     global $product;
     $group_id = wc_get_parent_grouped_id( $product->get_id());
@@ -98,7 +107,8 @@ function products_package($test) {
         <?php
         $product_group    = wc_get_product( $group_id );
         $children   = $product_group->get_children();
-        $product_shortcode = '[products ids="' . implode(',', $children) . '" columns="4"]';
+        array_push($children, $group_id);
+        $product_shortcode = '[products ids="' . implode(',', $children) . '" columns="5"]';
         
         echo do_shortcode($product_shortcode);
     }
