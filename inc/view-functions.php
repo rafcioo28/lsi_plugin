@@ -4,10 +4,27 @@
 if ( ! function_exists( 'login_redirect' ) ) {
     function login_redirect() {  
         global $pagenow;
-        if(!is_user_logged_in() && $pagenow != 'wp-login.php')
-            auth_redirect();
+        if(!is_user_logged_in() || !$GLOBALS['pagenow'] === 'wp-login.php'){
+           //auth_redirect();
+		   
+			wp_redirect( '/wp-admin/' );
+			exit;
+        }
     }
 }
+
+add_action('admin_init', 'disable_dashboard'); 
+function disable_dashboard() { 
+	if (!is_user_logged_in()) { 
+		return; 
+	} 
+	
+	if ( !current_user_can('manager') && is_admin()) { 
+		wp_redirect(home_url()); 
+		exit; 
+	} 
+}
+
 
 // Default quantity for package of products
 if ( ! function_exists( 'default_quantity' ) ) {
@@ -137,26 +154,40 @@ if ( ! function_exists( 'add_products_to_post' ) ) {
 }
 
 
-function manuals_table() { 
-	
-	$manuals = get_posts(array('post_type' => 'file'));
+function manuals_table() {
+    
+    $files_terms = get_terms( 'file_category' );
+    $content = '';
 
-	$content = '<table>';
+	foreach($files_terms as $term ){
+        $manuals = get_posts(array(
+            'post_type' => 'file',
+            'tax_query'	=> array(
+                array(
+                    'taxonomy' 	=> 'file_category',
+                    'field'	  	=> 'term_is',
+                    'terms'		=> $term->term_id,
+                ),
+            ),
+        )
+        );
 
-	foreach($manuals as $manual) {
-		$field = get_field('file', $manual->ID);
-		$content .= '<tr>';
-		$content .= '<td>';
-		$content .= $manual->post_title;
-		$content .= '</td>';
-		$content .= '<td>';
-		$content .= '<a href="' . $field['url'] . '">Pobierz</a>';
-		$content .= '</td>';
-		$content .= '</tr>';
-	}
-	 
+        $content .= "<h2>{$term->name}</h2>";
+        $content .= '<table>';
 
-	$content .= '</table>';
-
+	    foreach($manuals as $manual) {
+	    	$field = get_field('file', $manual->ID);
+	    	$content .= '<tr>';
+	    	$content .= '<td>';
+	    	$content .= $manual->post_title;
+	    	$content .= '</td>';
+	    	$content .= '<td>';
+	    	$content .= '<a href="' . $field['url'] . '">Pobierz</a>';
+	    	$content .= '</td>';
+	    	$content .= '</tr>';
+	    
+        }
+        $content .= '</table>';
+    }
 	return $content;
 } 

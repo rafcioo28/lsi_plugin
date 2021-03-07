@@ -6,6 +6,7 @@ if ( ! function_exists( 'lsi_product_query_filter' ) ) {
     function lsi_product_query_filter($query) {
         if (!current_user_can( 'show_all_products' )) {
 
+			/*
     	    if (!is_admin() AND (is_post_type_archive('product') OR is_archive()) AND $query->is_main_query()) {
     	    	// List of products with filter by customers groups
     	    	//$user_groups = get_the_terms(get_current_user_id(), 'customer_group');
@@ -33,7 +34,7 @@ if ( ! function_exists( 'lsi_product_query_filter' ) ) {
                 $query->set('meta_key', 'groups_list');
     	        $query->set('meta_query', $meta_query);
             
-			}
+			} */
 
 
 			//Query filter on homepage

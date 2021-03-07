@@ -138,3 +138,58 @@ function user_taxonomy_parent_file($parent_file)
     $parent_file = 'users.php';
     return $parent_file;
 }
+
+//-------------- Add column on taxonomy page - customers count
+
+/*
+* Unsets the 'posts' column and adds a 'users' column on the manage departments admin page.
+*/
+function cb_manage_departments_user_column( $columns ) {
+ unset( $columns['posts'] );
+ $columns['users'] = __( 'Klienci' );
+ return $columns;
+}
+add_filter( 'manage_edit-customer_group_columns', 'cb_manage_departments_user_column' );
+
+/**
+ * @param string $display WP just passes an empty string here.
+ * @param string $column The name of the custom column.
+ * @param int $term_id The ID of the term being displayed in the table.
+ */
+ function cb_manage_departments_column( $display, $column, $term_id ) {
+    if ( 'users' === $column ) {
+      $term = get_term( $term_id, 'customer_group' );
+      echo $term->count;
+    }
+  }
+  add_filter( 'manage_customer_group_custom_column', 'cb_manage_departments_column', 10, 3 );
+
+
+function lsi_admin_user_columns($columns) {
+    unset($columns['posts']);
+    $columns['group_filter']    =   'Filtr grupy';
+    $columns['price_off']       =   'Upust cenowy';
+   
+    return $columns;
+}
+
+add_filter('manage_users_columns', 'lsi_admin_user_columns', 10, 3);
+
+function lsi_admin_users_custom_columns($value, $column_id, $user_id) {
+    if ($column_id == 'group_filter'){
+        $user_groups = wp_get_object_terms($user_id, 'customer_group', array('fields' => 'all_with_object_id'));
+        $user_groups_names = function($value) {
+            return $value->name;
+        };
+
+        $groups = implode(array_map($user_groups_names, $user_groups), ', ');
+        
+        return $groups;
+    }
+    if ($column_id == 'price_off') {
+        $discount_level = get_field('discount_level', 'user_'. $user_id, true);
+        return $discount_level[0]->post_title;
+    }
+    return $value;
+  }
+add_action('manage_users_custom_column', 'lsi_admin_users_custom_columns', 10, 3);

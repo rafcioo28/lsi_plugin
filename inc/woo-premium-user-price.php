@@ -36,23 +36,23 @@ function premium_price_field_save( $product_id ){
 }
 
 
-add_action('woocommerce_product_get_price','change_price_regular_member', 10, 2);// Zmiana cen produktu w oparciu o logikę 
-
 function change_price_regular_member($price, $product){
     
+    $taxonomy_off = get_theme_mod('taxonomy_price_off');
+    $parent_taxonomy = get_term_by( 'name', $taxonomy_off, get_query_var( 'product_cat' ) );
     // If product category is software then get field value of discount
-    if( has_term('software', 'product_cat', $product->get_id() ) ) {
+    if( has_term($parent_taxonomy, 'product_cat', $product->get_id() ) ) {
         $user_id = get_current_user_id();
         $discount_level = get_field('discount_level', 'user_'. $user_id, false);
         $discount_percent = get_field('discount', $discount_level[0]);
         $price = $price * (1 - ($discount_percent/100));
 
     } else {
-        $roles = wp_get_current_user()->roles;
-        $premium_price = get_post_meta($product->get_id(), '_premium_price', true );
-        if(in_array('premium_customer', $roles) AND $premium_price) {
-            $price = $premium_price;
-        }
+        //$roles = wp_get_current_user()->roles;
+        //$premium_price = get_post_meta($product->get_id(), '_premium_price', true );
+        //if(in_array('premium_customer', $roles) AND $premium_price) {
+          //  $price = $premium_price;
+        //}
     }
     return $price;
 }
