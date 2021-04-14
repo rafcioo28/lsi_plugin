@@ -39,9 +39,9 @@ function file_category() {
 *   Functions for display files table on taxonomy archive page
 */
 
-function single_file_tax($query) {
-	if (!is_admin() AND is_tax('file_category') AND $query->is_main_query()) {
-		$query->set('posts_per_page', 1);
+function single_file_tax( $query ) {
+	if ( ! is_admin() AND is_tax( 'file_category' ) AND $query->is_main_query() ) {
+		$query->set( 'posts_per_page', 1 );
 	}
 }
 

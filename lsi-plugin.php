@@ -22,6 +22,9 @@ require plugin_dir_path(__FILE__) . '/inc/group-filter-for-products.php';
 require plugin_dir_path(__FILE__) . '/inc/query-modifications.php';
 require plugin_dir_path(__FILE__) . '/inc/custom-tax-widget.php';
 require plugin_dir_path(__FILE__) . '/inc/tax-for-price-disc.php';
+require plugin_dir_path(__FILE__) . '/inc/woo-tweaks.php';
+require plugin_dir_path(__FILE__) . '/inc/licence-functions.php';
+require plugin_dir_path(__FILE__) . '/inc/extra-field-order.php';
 
 //require get_theme_file_path('/inc/woo-tweaks.php');
 
@@ -36,6 +39,12 @@ add_filter( 'woocommerce_quantity_input_args', 'default_quantity', 10, 2 ); // s
 add_action( 'woocommerce_product_get_price','change_price_regular_member', 10, 2 );// Zmiana cen produktu w oparciu o logikę 
 //add_action( 'woocommerce_process_product_meta', 'premium_price_field_save' ); // Save product Hook
 
+//add_action( 'woocommerce_thankyou', 'custom_woocommerce_auto_complete_order' ); //Auto complete order 
+add_action( 'woocommerce_after_order_notes', 'lsi_vat_field' ); // NIP Number
+add_action( 'woocommerce_checkout_update_order_meta', 'lsi_checkout_vat_number_update_order_meta' );
+
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'lsi_vat_number_display_admin_order_meta', 10, 1 );
+
 add_action( 'customize_register', 'set_taxonomy_price_off' ); // set taxonomy for prices off (customizer)
 
 add_filter( 'acf/load_field/name=customer_group', 'acf_load_group_field_choices' ); // Field to pick a customer group on product pages
@@ -47,8 +56,11 @@ add_action( 'the_post', 'display_title_of_taxonomy' ); //Display taxonomy name o
 add_action( 'pre_get_posts', 'single_file_tax' ); // get only one post on taxonomy archive page
 add_action( 'the_content', 'file_taxonomy_pages'); // display table of files
 
+add_action('woocommerce_after_order_notes', 'custom_checkout_field'); //checkout extra fields
+
 // SHORTCODE
 add_shortcode( 'manuals', 'manuals_table' ); // register shortcode for files download 
+add_shortcode( 'display_licence', 'display_licence' ); // register shortcode for licence lists 
 
 
 /**

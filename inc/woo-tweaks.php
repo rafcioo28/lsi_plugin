@@ -11,6 +11,20 @@ function remove_woo_menu_items() {
     }
 }
 
+
+/**
+ * Auto Complete all WooCommerce orders.
+ */
+function custom_woocommerce_auto_complete_order( $order_id ) { 
+    if ( ! $order_id ) {
+        return;
+    }
+
+    $order = wc_get_order( $order_id );
+    $order->update_status( 'completed' );
+}
+
+
 /**
  * @param object $query The main query object.
  */
@@ -46,4 +60,41 @@ function query_customer_group_filter($query) {
             $query->set('meta_query', $meta_query);
         }
     }
+}
+
+
+/**
+* Pole NIP w zamówieniu
+*/
+function lsi_vat_field( $checkout ) {
+
+    echo '<div id="wpdesk_vat_field"><h2>' . __('Dane do Faktury') . '</h2>';
+    
+    woocommerce_form_field( 'vat_number', array(
+        'type'          => 'text',
+        'class'         => array( 'vat-number-field form-row-wide') ,
+        'label'         => __( 'NIP' ),
+        'placeholder'   => __( 'Wpisz NIP, aby otrzymać fakturę' ),
+    ), $checkout->get_value( 'vat_number' ));
+    
+    echo '</div>';
+
+}
+
+
+/**
+* Save NIP Number in the order meta
+*/
+function lsi_checkout_vat_number_update_order_meta( $order_id ) {
+    if ( ! empty( $_POST['vat_number'] ) ) {
+        update_post_meta( $order_id, '_vat_number', sanitize_text_field( $_POST['vat_number'] ) );
+    }
+}
+
+
+/**
+ * Wyświetlenie pola NIP
+ */
+function lis_vat_number_display_admin_order_meta( $order ) {
+    echo '<p><strong>' . __( 'NIP', 'woocommerce' ) . ':</strong> ' . get_post_meta( $order->id, '_vat_number', true ) . '</p>';
 }
